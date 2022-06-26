@@ -1,0 +1,35 @@
+server:
+  port: 80
+spring:
+  application:
+    # 当前SpringBoot应用名称 可以随便写 也可以不指定 目前用不到
+    name: reggie_take_out
+  # 数据源配置
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: root
+  # 解决循环依赖
+#  main:
+#    allow-circular-references: true
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射   eg:user:user_name  User:userName
+    map-underscore-to-camel-case: true
+    # 开启控制台日志 打印SQL语句
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 全局设置 主键生成策略 使用雪花算法
+      id-type: ASSIGN_ID
+      # 全局设置 逻辑删除
+      # 逻辑删除字段对应的实体类中属性名称
+      logic-delete-field: isDeleted
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+reggie:
+  # 设置服务器文件上传保存路径  注意：最后一个斜杠不能省略
+  upload: D:\reggie\
+
