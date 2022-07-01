@@ -98,6 +98,59 @@ public class ShoppingCartController {
         return flag?R.success("添加购物车成功！"):R.error("添加购物车失败！");
     }
 
+    /**
+     * 从购物车移除套餐/菜品
+     * @param shoppingCart    购物车对象
+     * @return      响应信息
+     */
+    @PostMapping("/sub")
+    public R sub(@RequestBody ShoppingCart shoppingCart) {
+
+        log.info("shoppingCart: {}", shoppingCart);
+        //从前端载荷中：setmealId/dishId
+
+        //检查用户ID -> 当前购物车属于哪个用户的
+        Long currentId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(currentId);
+
+        //1.判断移除的是套餐还是菜品 这里假设移除的是菜品，后续再做判断
+        Long dishId = shoppingCart.getDishId();
+
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId, currentId);
+
+        if (dishId != null) {
+            //dishId不为空 说明移除的是菜品
+            //将条件填入条件过滤器中
+            wrapper.eq(ShoppingCart::getDishId, dishId);
+            wrapper.eq(shoppingCart.getDishFlavor() != null, ShoppingCart::getDishFlavor, shoppingCart.getDishFlavor());
+
+        } else {
+            //这说明移除的是套餐
+            wrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
+        }
+
+        //根据上述条件查询 购车中是否有对应的 菜品/套餐 记录
+        //SQL:select * from shopping_cart where user_id = ? and dish_id/setmeal_id = ?
+        ShoppingCart cartServiceOne = shoppingCartService.getOne(wrapper);
+        log.info("{}", cartServiceOne);
+
+        //如果购物车中只有一份，直接remove该菜品/套餐
+        boolean flag = false;
+
+        if (cartServiceOne.getNumber() == 1) {
+            flag = shoppingCartService.remove(wrapper);
+        } else {
+            //有多份则num - 1
+            shoppingCart.setNumber(cartServiceOne.getNumber() - 1);
+            //不设置 id 会查不到数据导致update rows：0
+            shoppingCart.setId(cartServiceOne.getId());
+            flag = shoppingCartService.updateById(shoppingCart);
+        }
+
+        return R.success(shoppingCart);
+    }
+
     //2.查询当前登录用户购物车中的商品列表信息
     @GetMapping("/list")
     public R list(){

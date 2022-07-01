@@ -45,16 +45,11 @@
   // 响应拦截器
   service.interceptors.response.use(res => {
 	  console.log('---响应拦截器---',res);
-	  //res.data  = response.data = Result对象
       const code = res.data.code;
       const msg = res.data.msg;
       if (res.data.code === 0 && res.data.msg === 'NOTLOGIN') {// 返回登录页面
         console.log('---/backend/page/login/login.html---',code)
         localStorage.removeItem('userInfo')
-        //由于之前搭建环境时文件在static目录来回拖动 导致这里的路径发生改变了
-        //window.top.location.href = '../page/login/login.html'   //404
-        //window.top.location.href = '../login/login.html'
-        //前端静态资源素材实际提供的设置
         window.top.location.href = '/backend/page/login/login.html'
       } else {
         return res.data

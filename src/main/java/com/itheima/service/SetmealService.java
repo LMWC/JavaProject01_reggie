@@ -11,4 +11,6 @@ public interface SetmealService extends IService<Setmeal> {
     boolean saveWithDish(SetmealDto setmealDto);
 
     boolean removeWithDish(List<Long> ids);
+
+    boolean updateWithStatus(Integer sts, List<Long> ids);
 }

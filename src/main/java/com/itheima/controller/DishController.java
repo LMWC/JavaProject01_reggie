@@ -173,5 +173,33 @@ public class DishController {
         //return R.success(list);
         return R.success(dishDtoList);
     }
+
+    /**
+     * 批量修改菜品状态
+     * @param status     菜品状态
+     * @param ids        菜品id
+     * @return           响应信息
+     */
+    @PostMapping("/status/{status}")
+    public R status(@PathVariable Integer status, @RequestParam List<Long> ids) {
+
+        boolean flag = dishService.updateWithStatus(status, ids);
+
+        return flag ? R.success("修改状态成功") : R.error("修改状态失败");
+
+    }
+
+    /**
+     * 批量删除菜品
+     * @param ids    菜品id
+     * @return       响应信息
+     */
+    @DeleteMapping
+    public R delete(@RequestParam List<Long> ids) {
+
+        boolean flag = dishService.removeByIds(ids);
+
+        return  flag ? R.success("删除成功") : R.error("删除失败");
+    }
 }
 

@@ -96,4 +96,16 @@ public class UserController {
             return R.error("验证码输入有误");
         }
     }
+
+    /**
+     * 用户退出登录
+     * @return
+     */
+    @PostMapping("/loginout")
+    public R loginout(HttpSession session) {
+
+        session.invalidate();
+
+        return R.success("退出登录成功");
+    }
 }

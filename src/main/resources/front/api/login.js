@@ -1,10 +1,10 @@
 function loginApi(data) {
     return $axios({
-      'url': '/user/login',
-      'method': 'post',
-      data
+        'url': '/user/login',
+        'method': 'post',
+        data
     })
-  }
+}
 
 function validateCodeApi(data) {
     return $axios({
@@ -15,10 +15,11 @@ function validateCodeApi(data) {
 }
 
 function loginoutApi() {
-  return $axios({
-    'url': '/user/loginout',
-    'method': 'post',
-  })
+    return $axios({
+        'url': '/user/loginout',
+        'method': 'post',
+    })
 }
+
 
   

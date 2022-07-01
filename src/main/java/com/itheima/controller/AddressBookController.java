@@ -102,4 +102,38 @@ public class AddressBookController {
         //SQL:select * from address_book where user_id = ? order by update_time desc
         return R.success(addressBookService.list(queryWrapper));
     }
+
+    /**
+     * 编辑收货地址
+     * @return    响应结果
+     */
+    @PutMapping
+    public R update(@RequestBody AddressBook addressBook) {
+
+        addressBookService.updateById(addressBook);
+
+        return R.success("地址编辑成功！");
+
+    }
+
+
+    /**
+     * 删除地址
+     * @param ids   地址id
+     * @return      响应信息
+     */
+
+    @DeleteMapping
+    public R<String> delete(@RequestParam Long ids) {
+
+        //新建update条件构造器
+        LambdaUpdateWrapper<AddressBook> updateWrapper = new LambdaUpdateWrapper<>();
+        //用参数 ids 和 AddressBook中的 id 进行匹配，匹配后将其 isDeleted 字段置为1进行删除
+        updateWrapper.in(AddressBook::getId, ids).set(AddressBook::getIsDeleted,1);
+
+        //更新数据
+        addressBookService.update(updateWrapper);
+
+        return R.success("删除成功");
+    }
 }

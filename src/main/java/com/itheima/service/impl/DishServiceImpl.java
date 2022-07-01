@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -134,5 +135,24 @@ public class DishServiceImpl extends ServiceImpl<DishDao, Dish> implements DishS
 
         //3.菜品基本信息和菜品口味信息同时修改成功  表示菜品修改成功
         return flag1&&flag2;
+    }
+
+    @Override
+    public boolean updateWithStatus(Integer status, List<Long> ids) {
+
+        List<Dish> list= new ArrayList<>();
+
+        for (Long id : ids) {
+            Dish dish = new Dish();
+
+            dish.setId(id);
+            dish.setStatus(status);
+
+            list.add(dish);
+        }
+
+        boolean flag = this.updateBatchById(list);
+
+        return flag;
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,5 +86,25 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealDao, Setmeal> impleme
         return flag1&&flag2;
     }
 
+    @Override
+    public boolean updateWithStatus(Integer status, List<Long> ids) {
+
+        //新建一个集合
+        List<Setmeal> list = new ArrayList<>();
+
+        //遍历ids 将id、status设置到list中
+        for (Long id : ids) {
+            Setmeal setmeal = new Setmeal();
+            setmeal.setId(id);
+            setmeal.setStatus(status);
+
+            list.add(setmeal);
+        }
+
+        boolean flag = this.updateBatchById(list);
+
+        return flag;
+
+    }
 
 }

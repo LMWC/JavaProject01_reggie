@@ -116,11 +116,9 @@
         data() {
           return {
              input: '',
-             //分页工具栏所需要的的总条数
              counts: 0,
              page: 1,
              pageSize: 10,
-             //表格要展示当前页数据模型
              tableData : [],
              id : '',
              status : '',
@@ -171,16 +169,13 @@
           },
           //状态修改
           statusHandle (row) {
-            //拿到当前要修改的员工id
             this.id = row.id
-            //拿到当前要修改的员工状态
             this.status = row.status
             this.$confirm('确认调整该账号的状态?', '提示', {
               'confirmButtonText': '确定',
               'cancelButtonText': '取消',
               'type': 'warning'
               }).then(() => {
-                //发送启用禁用员工的ajax请求  1 --> 0 --> false    0-->1-->true
               enableOrDisableEmployee({ 'id': this.id, 'status': !this.status ? 1 : 0 }).then(res => {
                 console.log('enableOrDisableEmployee',res)
                 if (String(res.code) === '1') {

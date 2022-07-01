@@ -186,7 +186,6 @@
             prop="region"
             class="uploadImg"
           >
-            <!--菜品图片上传 upload组件  /common/upload-->
             <el-upload
               class="avatar-uploader"
               action="/common/upload"
@@ -509,9 +508,8 @@
           handleAvatarSuccess (response, file, fileList) {
             // 拼接down接口预览
             if(response.code === 0 && response.msg === '未登录'){
-              window.top.location.href = '../login/login.html'
+              window.top.location.href = '/backend/page/login/login.html'
             }else{
-              //菜品图片上传成功之后  进行下载预览
               this.imageUrl = `/common/download?name=${response.data}`
               this.ruleForm.image = response.data
             }

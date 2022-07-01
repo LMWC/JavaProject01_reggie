@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.itheima.bean.Dish;
 import com.itheima.dto.DishDto;
 
+import java.util.List;
+
 public interface DishService extends IService<Dish> {
 
     /**
@@ -26,4 +28,11 @@ public interface DishService extends IService<Dish> {
      * @return
      */
     boolean updateWithFlavor(DishDto dishDto);
+
+    /**
+     * 批量修改菜品
+     * @param status   菜品 停售/启售 状态
+     * @param ids      菜品id
+     */
+    boolean updateWithStatus(Integer status, List<Long> ids);
 }

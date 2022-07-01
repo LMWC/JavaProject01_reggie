@@ -115,4 +115,18 @@ public class SetmealController {
         //2.返回处理结果
         return R.success(list);
     }
+
+    /**
+     * 批量修改套餐状态
+     * @param sts   状态
+     * @param ids   套餐id
+     * @return      响应信息
+     */
+    @PostMapping("/status/{sts}")
+    public R status(@PathVariable Integer sts, @RequestParam List<Long> ids) {
+
+        boolean flag = setmealService.updateWithStatus(sts, ids);
+
+        return flag? R.success("状态修改成功～"): R.error("状态修改失败");
+    }
 }
