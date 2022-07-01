@@ -11,7 +11,16 @@ spring:
       url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: root
-  # 解决循环依赖
+  # redis环境配置
+  redis:
+    host: 192.168.36.128
+    port: 6379
+    password: 123456
+    database: 0
+  cache:
+    redis:
+      time-to-live: 1800000  #设置redis中存储数据的有效时间
+# 解决循环依赖
 #  main:
 #    allow-circular-references: true
 mybatis-plus:
@@ -32,4 +41,4 @@ mybatis-plus:
 reggie:
   # 设置服务器文件上传保存路径  注意：最后一个斜杠不能省略
   upload: D:\reggie\
-
+  # upload: /root/reggie/
