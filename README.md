@@ -21,3 +21,4 @@
 - nginx-1.16.1
 - FinalShell 3.8.3
 - Workstation 16 Pro 16.1.1 build-17801498
+- CentOS-7-x86_64-DVD-1908
