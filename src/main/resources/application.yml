@@ -5,13 +5,46 @@ spring:
     # 当前SpringBoot应用名称 可以随便写 也可以不指定 目前用不到
     name: reggie_take_out
   # 数据源配置
-  datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: root
-      password: root
-  # redis环境配置
+  #  datasource:
+  #    druid:
+  #      driver-class-name: com.mysql.cj.jdbc.Driver
+  #      url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+  #      username: root
+  #      password: root
+  # 使用shardingJDBC配置数据源实现读写分离
+  shardingsphere:
+    datasource:
+      names:
+        master,slave
+      # 主数据源
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.36.129:3306/reggie?characterEncoding=utf-8
+        username: itcast
+        password: ABcd_123
+      # 从数据源
+      slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.36.130:3306/reggie?characterEncoding=utf-8
+        username: itcast
+        password: ABcd_123
+    masterslave:
+      # 读写分离配置
+      load-balance-algorithm-type: round_robin
+      # 最终的数据源名称
+      name: dataSource
+      # 主库数据源名称
+      master-data-source-name: master
+      # 从库数据源名称列表，多个逗号分隔
+      slave-data-source-names: slave
+    props:
+      sql:
+        show: true #开启SQL显示，默认false  # redis环境配置
+  # 允许程序自定义的bean对象覆盖SpringBoot自动配置的bean对象
+  main:
+    allow-bean-definition-overriding: true
   redis:
     host: 192.168.36.128
     port: 6379
