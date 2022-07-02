@@ -117,4 +117,39 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersDao, Orders> implements
 
         return flag1&&flag2;
     }
+
+    /**
+     * 再来一单
+     * @param orders
+     */
+    @Override
+    public void again(Orders orders) {
+        //获取order的id，通过id将订单中的菜品或套餐信息加入购物车
+
+        Orders orders1 = this.getById(orders);
+        String orderNumber = orders1.getNumber();
+
+        //在orderdetial中通过订单号查找
+        LambdaQueryWrapper<OrderDetail> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderDetail::getOrderId,orderNumber);
+        List<OrderDetail> orderDetailList = orderDetailService.list(queryWrapper);
+
+        List<ShoppingCart> shoppingCartList = orderDetailList.stream().map((item) -> {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            shoppingCart.setName(item.getName());
+            shoppingCart.setImage(item.getImage());
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCart.setDishId(item.getDishId()==null ? null : item.getDishId());
+            shoppingCart.setSetmealId(item.getSetmealId()==null ? null : item.getSetmealId());
+            shoppingCart.setDishFlavor(item.getDishFlavor());
+            shoppingCart.setNumber(item.getNumber());
+            shoppingCart.setAmount(item.getAmount());
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            return shoppingCart;
+        }).collect(Collectors.toList());
+
+
+        shoppingCartService.saveBatch(shoppingCartList);
+
+    }
 }

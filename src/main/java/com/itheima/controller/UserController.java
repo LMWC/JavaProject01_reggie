@@ -8,6 +8,7 @@ import com.itheima.utils.SMSUtils;
 import com.itheima.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequestMapping("/user")
@@ -23,6 +25,20 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /*====================优化：1.在UserController中注入RedisTemplate对象======================*/
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    /*
+        缓存优化1：缓存短信验证码实现思路
+            1.在UserController中注入RedisTemplate对象
+            2.在sendMsg方法中  将生成的验证码存入到redis中
+            3.在login方法中    从redis中获取验证码，当登录成功之后，删除redis中缓存的验证码
+    */
+
+
+
 
     /*
         可以使用map集合对象接收json格式参数 json对象的key作为map的key json对象的值就作为map的value
@@ -43,7 +59,11 @@ public class UserController {
         //SMSUtils.sendMessage("瑞吉外卖","瑞吉外卖",phone,validateCode.toString());
 
         //4.将验证码存入到session中 方便在登录时和用户输入的验证码进行比对
-        session.setAttribute("validateCode",validateCode);
+        //session.setAttribute("validateCode",validateCode);
+
+        /*====================优化：2.在sendMsg方法中  将生成的验证码存入到redis中,设置有效时间======================*/
+        //redis存储验证码数据的key 要使用手机号
+        redisTemplate.opsForValue().set(phone,validateCode.toString(),5, TimeUnit.MINUTES);
 
         //5.响应处理结果
         //return R.success("验证码发送成功！");
@@ -63,7 +83,10 @@ public class UserController {
         String code = map.get("code").toString();
 
         //2.获取session中保存的验证码 和用户输入的验证码做比对
-        Object validateCode = session.getAttribute("validateCode");
+        //Object validateCode = session.getAttribute("validateCode");
+
+        /*====================优化：3.1在login方法中 从redis中获取验证码======================*/
+        Object validateCode = redisTemplate.opsForValue().get(phone);
 
         if(validateCode!=null && validateCode.toString().equals(code)){
             //3.比对一致：登录成功  a：判断表中是否存在对应手机号的用户信息 如果没有 就存入进去 b：将登录成功的用户id存入session
@@ -89,6 +112,9 @@ public class UserController {
             Long userId = user==null?userInfo.getId():user.getId();
 
             session.setAttribute("user",userId);
+
+            /*====================优化：3.2在login方法中 登录成功之后，删除redis中缓存的验证码======================*/
+            redisTemplate.delete(phone);
 
             return R.success("登录成功！");
         }else{

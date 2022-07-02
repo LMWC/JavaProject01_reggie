@@ -144,4 +144,16 @@ public class OrderController {
 
         return R.success("订单派送成功！");
     }
+
+    /**
+     * 再来一单
+     * @param orders
+     * @return
+     */
+    @PostMapping("/again")
+    public R<String> again(@RequestBody Orders orders){
+
+        ordersService.again(orders);
+        return R.success("相同菜品已加入购物车！");
+    }
 }

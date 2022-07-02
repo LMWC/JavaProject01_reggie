@@ -12,6 +12,8 @@ import com.itheima.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,7 @@ public class SetmealController {
     private CategoryService categoryService;
 
     //新增套餐
+    @CacheEvict(cacheNames = "setmeal_",key = "#setmealDto.categoryId+'_'+#setmealDto.status")
     @PostMapping
     public R add(@RequestBody SetmealDto setmealDto){
         log.info("新增套餐-套餐信息：{}",setmealDto);
@@ -92,6 +95,7 @@ public class SetmealController {
         单个删除和批量删除 都是传递一个参数，只是参数值不一样 ，所以此时定义List集合接收请求参数
         由于list集合并不能直接使用接收请求参数  所以，需要在参数前打上@RequestParam注解 将请求参数映射封装到List集合对象中
      */
+    @CacheEvict(cacheNames = "setmeal_",allEntries = true)
     @DeleteMapping
     public R delete(@RequestParam List<Long> ids){
 
@@ -101,6 +105,8 @@ public class SetmealController {
         return flag?R.success("套餐删除成功！"):R.error("套餐删除失败！");
     }
 
+    //根据分类id 查询套餐列表信息
+    @Cacheable(cacheNames = "setmeal_",key = "#categoryId+'_'+#status")
     @GetMapping("/list")
     public R list(Long categoryId,Integer status){
         //1.调用service根据分类id和套餐状态查询指定分类下的套餐列表信息

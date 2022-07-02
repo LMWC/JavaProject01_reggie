@@ -1,5 +1,6 @@
 package com.itheima.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.bean.Category;
@@ -13,10 +14,12 @@ import com.itheima.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +36,10 @@ public class DishController {
     @Autowired
     private DishFlavorService dishFlavorService;
 
+    /*==========================优化：1.注入RedisTemplate对象=========================*/
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     //新增菜品
     @PostMapping
     public R add(@RequestBody DishDto dishDto){
@@ -40,6 +47,10 @@ public class DishController {
 
         //1.调用service完成菜品新增
         boolean flag = dishService.saveWithFlavor(dishDto);
+
+        /*=======================3.1：删除新增菜品所属分类对应的缓存菜品数据========================*/
+        String key = "dish_"+dishDto.getCategoryId()+"_1";
+        redisTemplate.delete(key);
 
         //2.返回处理结果
         return flag?R.success("新增菜品成功！"):R.error("新增菜品失败！");
@@ -131,6 +142,26 @@ public class DishController {
     //修改菜品
     @PutMapping
     public R update(@RequestBody DishDto dishDto){
+        /*====================优化：方式一：4.1:删除当前菜品原来的分类和现在的分类对应的缓存数据====================*/
+/*
+
+        //由于此时还没有进行修改操作 当前数据库中存储的还是原有的菜品数据  那么就可以通过菜品的id得到该菜品原来的所属分类id
+        Long oldCategoryId = dishService.getById(dishDto.getId()).getCategoryId();
+        //菜品新的所属分类id  就取决于前端传递过来的参数
+        Long newCategoryId = dishDto.getCategoryId();
+
+        redisTemplate.delete("dish_"+oldCategoryId+"_1");//删除该菜品原来的所属分类对应的缓存菜品数据
+        if(!oldCategoryId.equals(newCategoryId)){
+            redisTemplate.delete("dish_"+newCategoryId+"_1");//删除该菜品现在的所属分类对应的缓存菜品数据
+        }
+*/
+        /*====================优化：方式二：4.1:直接删除所有分类对应的缓存菜品数据【简单粗暴  不实用】====================*/
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);  //delete方法这里识别不了key的模糊匹配  因此你需要先通过key的模糊匹配进行查询 查询之后再进行删除
+
+
+
+
         //1.调用service完成修改菜品
         boolean flag = dishService.updateWithFlavor(dishDto);
 
@@ -141,6 +172,24 @@ public class DishController {
     //根据分类id查询菜品列表
     @GetMapping("/list")
     public R list(Long categoryId){
+
+        //设置分类的菜品数据存入到redis中的key
+        //redis中key命名规范：方式一：项目名::模块名::key唯一标识     方式二：项目名_模块名_key唯一标识
+        //eg:1:菜品所属分类的状态
+        String key = "dish_"+categoryId+"_1";
+
+        /*==========================优化：2.1:判断redis中缓存的是否有当前分类的菜品数据  有：从redis 没有：从MySQL=========================*/
+        Object o = redisTemplate.opsForValue().get(key);  //o对应的就是菜品集合数据的json字符串
+        if(o!=null){
+            //有：从redis中取  取完响应给前端 也不会在继续向下执行代码了
+            System.out.println("redis中返回....");
+            //将o中存储的菜品集合数据的json字符串转为List集合 使用R对象封装响应给前端
+            return R.success(JSON.parse(o.toString()));
+        }
+
+        /*==========================优化：2.2:没有：从MySQL查询返回  并存入到redis中一份=========================*/
+        System.out.println("MySQL中返回...");
+
         //1.设置查询条件
         LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Dish::getCategoryId,categoryId);
@@ -169,6 +218,10 @@ public class DishController {
 
 
         log.info("dishDtoList：{}",dishDtoList);
+
+        /*==========================优化：2.3:没有：从MySQL查询返回  并存入到redis中一份=========================*/
+        redisTemplate.opsForValue().set(key,JSON.toJSONString(dishDtoList));
+
         //3.返回查询结果
         //return R.success(list);
         return R.success(dishDtoList);
