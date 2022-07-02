@@ -11,6 +11,9 @@ import com.itheima.dto.DishDto;
 import com.itheima.service.CategoryService;
 import com.itheima.service.DishFlavorService;
 import com.itheima.service.DishService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Api(tags = "菜品管理")
 @Slf4j
 @RequestMapping("/dish")
 @RestController
@@ -41,6 +45,8 @@ public class DishController {
     private RedisTemplate redisTemplate;
 
     //新增菜品
+    @ApiOperation("新增菜品")
+    @ApiImplicitParam(name="dishDto",value="封装菜品及口味信息对象")
     @PostMapping
     public R add(@RequestBody DishDto dishDto){
         log.info("新增菜品：DishDto={}",dishDto);

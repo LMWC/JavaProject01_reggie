@@ -2,9 +2,14 @@ package com.itheima.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.itheima.bean.Dish;
 import com.itheima.bean.Employee;
 import com.itheima.bean.R;
 import com.itheima.service.EmployeeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -13,6 +18,35 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
+/*
+    @Api：打在Controller类上 设置当前接口所属分类，使用tags属性
+
+
+    @ApiModel：打在响应实体类上【javabean上】 设置响应数据的描述信息
+    @ApiModelProperty：打在javabean属性上，描述响应数据的属性信息
+
+
+    @ApiOperation:打在请求处理方法上 设置方法描述信息
+    @APiImplicatitParams：设置请求方法一组参数描述信息
+    @APiImplicatitParam：设置请求方法一个参数描述信息
+        注意：
+            1.如果方法只有一个参数 可以使用@APiImplicatitParam注解进行描述
+                @ApiImplicitParam(name="dishDto",value="封装菜品及口味信息对象")
+            2.如果方法有多个简单类型参数，可以使用@APiImplicatitParams注解进行描述
+                @ApiOperation("员工信息分页查询")
+                @ApiImplicitParams({
+                        @ApiImplicitParam(name="page",value = "当前页码"),
+                        @ApiImplicitParam(name="pageSize",value = "每页显示条数"),
+                        @ApiImplicitParam(name="name",value = "员工姓名")
+                })
+                @GetMapping("/page")
+                public R page(Integer page,Integer pageSize,String name){}
+        问题：
+            1.如果方法只有一个参数 且该参数为对象类型，可以使用@APiImplicatitParam注解进行描述，但是不方便描述对象的属性信息
+            2.如果方法有多个参数 且参数为对象类型，使用 @ApiImplicitParams注解描述也会出问题
+
+ */
+@Api(value="员工管理1",tags = "员工管理")
 @Slf4j
 @RequestMapping("/employee")
 @RestController
@@ -20,6 +54,12 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @ApiOperation("测试接口")
+    @PostMapping("/test")
+    public R login(@RequestBody Employee emp, Dish dish){
+        return R.success("OK");
+    }
 
     /*
          //1.接收到用户登录输入的用户名和密码，封装到了emp对象中 对密码进行MD5加密
@@ -108,6 +148,12 @@ public class EmployeeController {
     }
 
     //分页查询
+    @ApiOperation("员工信息分页查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="page",value = "当前页码"),
+            @ApiImplicitParam(name="pageSize",value = "每页显示条数"),
+            @ApiImplicitParam(name="name",value = "员工姓名")
+    })
     @GetMapping("/page")
     public R page(Integer page,Integer pageSize,String name){
         //1.配置MyBatisPlus分页拦截器

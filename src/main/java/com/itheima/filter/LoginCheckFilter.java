@@ -47,7 +47,17 @@ public class LoginCheckFilter implements Filter {
 
         /*=====================================================使用Spring提供的路径匹配器===================================================*/
         //a.声明不需要拦截的路径地址数组
-        String[] paths = {"/backend/**","/front/**","/employee/login","/employee/logout","/user/sendMsg","/user/login"};
+        String[] paths = {"/backend/**",
+                "/front/**",
+                "/employee/login",
+                "/employee/logout",
+                "/user/sendMsg",
+                "/user/login",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
+        };
         //b.遍历不需要进行拦截的路径地址  和当前请求地址进行匹配
         boolean flag = false;
         for (String path : paths) {
