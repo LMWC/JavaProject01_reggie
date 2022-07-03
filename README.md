@@ -8,6 +8,15 @@
 [reggie_take_outV1.1-项目优化1](https://github.com/LMWC/reggie/tree/V1.1-%E9%A1%B9%E7%9B%AE%E4%BC%98%E5%8C%961)  
 [reggie_take_outV1.2-项目优化2](https://github.com/LMWC/reggie/tree/V1.2-%E9%A1%B9%E7%9B%AE%E4%BC%98%E5%8C%962)  
 [reggie_take_outV1.3-项目优化3](https://github.com/LMWC/reggie/tree/V1.3-%E9%A1%B9%E7%9B%AE%E4%BC%98%E5%8C%963)  
+后台管理系统-员工管理  
+           -分类管理  
+           -菜品管理  
+           -套餐管理  
+           -订单管理  
+前台用户系统-个人中心  
+           -菜品展示  
+           -购物车  
+           -订单管理  
 
 
 
