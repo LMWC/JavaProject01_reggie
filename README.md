@@ -1,6 +1,7 @@
 # reggie
 **reggie_take_out瑞吉外卖**  
 =========================
+本项目（瑞吉外卖）是专门为餐饮企业（餐厅、饭店）定制的一款软件产品，包括 系统管理后台 和 移动端应用 两部分。其中系统管理后台主要提供给餐饮企业内部员工使用，可以对餐厅的分类、菜品、套餐、订单、员工等进行管理维护。移动端应用主要提供给消费者使用，可以在线浏览菜品、添加购物车、下单等。  
 图包中的图片请放在D:\reggie文件夹中，放在其他路径请修改yml配置文件  
 [reggie_take_out初始化工程](https://github.com/LMWC/reggie/tree/master)  
 [reggie_take_outV1.0-项目实战](https://github.com/LMWC/reggie/tree/V1.0-%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98)  
